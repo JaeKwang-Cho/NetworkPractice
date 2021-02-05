@@ -6,10 +6,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -38,6 +40,25 @@ public class MyNetworkProject extends AppCompatActivity {
         main_list.setAdapter(adapter);
         // adapter.notifyDataSetChanged();
     }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.menu_write:
+                Intent write_intent= new Intent(this, WriteActivty.class);
+                startActivity(write_intent);
+                break;
+            case R.id.menu_reload:
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     // 데이터 초기화 메서드
     public void init(){
         HashMap<String,Object> map1= new HashMap<String,Object>();
