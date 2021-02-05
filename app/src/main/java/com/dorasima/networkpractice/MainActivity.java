@@ -2,6 +2,7 @@ package com.dorasima.networkpractice;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -36,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
         thread.start();
     }
     public void nextBtn(View view){
-
+        Intent intent = new Intent(this, HttpBasicClient.class);
+        startActivity(intent);
     }
 
 
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             NetworkCallback callback = new NetworkCallback();
             call.enqueue(callback);
         }
-   }
+    }
    // 응답결과가 수신되면 반응하는 콜백
     class NetworkCallback implements Callback{
        @Override
@@ -73,9 +75,11 @@ public class MainActivity extends AppCompatActivity {
        }
        @Override
        // 응답결과가 정싱적으로 수신되었을 때 호출되는 메서드
-       public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+       public void onResponse(
+               @NotNull Call call, @NotNull Response response) throws IOException {
             // 응답 결과를 수신한다.
-           final String result = response.body().string(); // 여기서 IOException을 발생시킨다.
+           final String result = response.body().string();
+           // 여기서 IOException을 발생시킨다.
 
            // 화면 갱신을 위해 runOnUiThread를 이용한다.
            runOnUiThread(new Runnable() {
