@@ -2,6 +2,7 @@ package com.dorasima.networkpractice;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.TextureView;
 import android.view.View;
@@ -29,6 +30,10 @@ public class HttpBasicClient extends AppCompatActivity {
         setContentView(R.layout.activity_http_basic_client);
 
         text2 = (TextView)findViewById(R.id.textView2);
+    }
+    public void nextBtn(View view){
+        Intent intent = new Intent(this, MyNetworkProject.class );
+        startActivity(intent);
     }
 
     public void connectServerBtn(View view){

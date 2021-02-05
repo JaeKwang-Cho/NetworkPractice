@@ -12,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NetworkPractice"
         android:usesCleartextTraffic="true">
-        <activity android:name=".HttpBasicClient"></activity>
+        <activity android:name=".MyNetworkProject"></activity>
+        <activity android:name=".HttpBasicClient" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
