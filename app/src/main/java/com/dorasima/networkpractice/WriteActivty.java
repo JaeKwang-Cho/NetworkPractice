@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -80,6 +82,9 @@ public class WriteActivty extends AppCompatActivity {
                 startActivityForResult(camera_intent,CAMERA_ACTIVITY);
                 break;
             case R.id.menu_gallery:
+                Intent gallery_intent = new Intent(Intent.ACTION_PICK);
+                gallery_intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+                startActivityForResult(gallery_intent,GALLERY_ACTIVITY);
                 break;
             case R.id.menu_upload:
                 break;
@@ -100,6 +105,31 @@ public class WriteActivty extends AppCompatActivity {
                 float degree= getDegree(picPath);
                 // 회전시킨것을 원본에 덮어 씌우기 한다.
                 Bitmap bitmap3 = rotateBitmap(bitmap2,picPath,degree);
+                imageView2.setImageBitmap(bitmap3);
+            }
+        }else if(requestCode==GALLERY_ACTIVITY){
+            if(resultCode==RESULT_OK){
+                // 이미지에 접근할 수 있는 uri 개체를 추출한다.
+                ContentResolver resolver = getContentResolver();
+                // contentProvider로 부터 이미지의 경로를 추출한다.
+                Cursor cursor = resolver.query(
+                        data.getData(),null,null,null,null);
+                cursor.moveToNext();
+
+                // 이미지 파일의 이름이 들어있는 컬럼이다.
+                int idx = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                // 해당 사진의 경로를 얻는다.
+                String sourcePath = cursor.getString(idx);
+
+                Bitmap bitmap = BitmapFactory.decodeFile(sourcePath);
+                Bitmap bitmap2 = resizeBitmap(1024,bitmap);
+                float degree = getDegree(sourcePath);
+
+                String fileName = "temp_"+System.currentTimeMillis()+".jpg";
+                picPath = dirPath+"/"+fileName;
+
+                Bitmap bitmap3 = rotateBitmap(bitmap2,picPath,degree);
+
                 imageView2.setImageBitmap(bitmap3);
             }
         }
