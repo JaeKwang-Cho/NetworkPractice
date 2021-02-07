@@ -5,9 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -31,6 +37,13 @@ public class MyNetworkProject extends AppCompatActivity implements CustomRecycle
     // 리스트뷰 구성을 위해서 필요한 데이터가 담겨 있는 ArrayList
     ArrayList<HashMap<String, Object>> listData = new ArrayList<HashMap<String, Object>>();
     RecyclerView main_list;
+    
+    // 확인할 권한 목록
+    String [] permission_list ={
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +52,12 @@ public class MyNetworkProject extends AppCompatActivity implements CustomRecycle
 
         main_list = (RecyclerView)findViewById(R.id.main_list);
 
-        init();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            requestPermissions(permission_list,0);
+        }else{
+            init();
+        }
+
         // LinearLayoutManager를 세팅해주는 것을 잊지말자.
         main_list.setLayoutManager(new LinearLayoutManager(this));
         CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData);
@@ -55,6 +73,16 @@ public class MyNetworkProject extends AppCompatActivity implements CustomRecycle
         // adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        for(int result:grantResults){
+            if(result== PackageManager.PERMISSION_DENIED){
+                return;
+            }
+        }
+        init();;
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -74,8 +102,16 @@ public class MyNetworkProject extends AppCompatActivity implements CustomRecycle
     }
 
 
-    // 데이터 초기화 메서드
+    // 데이터, 경로 초기화 메서드
     public void init(){
+        String tempPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String dirPath = tempPath+"/Android/data/"+getPackageName();
+
+        File file = new File(dirPath);
+        if(file.exists()==false){
+            file.mkdir();
+        }
+
         HashMap<String,Object> map1= new HashMap<String,Object>();
         HashMap<String,Object> map2= new HashMap<String,Object>();
         HashMap<String,Object> map3= new HashMap<String,Object>();
