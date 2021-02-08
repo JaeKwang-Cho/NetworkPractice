@@ -21,10 +21,18 @@ import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+
+import okhttp3.Call;
+import okhttp3.FormBody;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 public class WriteActivty extends AppCompatActivity {
 
@@ -34,6 +42,8 @@ public class WriteActivty extends AppCompatActivity {
     Uri contentUri;
     // 이미지 파일명을 포함한 경로
     String picPath;
+
+    EditText editText, editText2;
 
     // Activity를 구분하기 위한 값
     final int CAMERA_ACTIVITY = 1;
@@ -47,6 +57,8 @@ public class WriteActivty extends AppCompatActivity {
         setContentView(R.layout.activity_write_activty);
 
         imageView2 = (ImageView)findViewById(R.id.imageView2);
+        editText = (EditText)findViewById(R.id.editText);
+        editText2 = (EditText)findViewById(R.id.editText2);
 
         // 경로를 구한다.
         String tempPath = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -87,6 +99,8 @@ public class WriteActivty extends AppCompatActivity {
                 startActivityForResult(gallery_intent,GALLERY_ACTIVITY);
                 break;
             case R.id.menu_upload:
+                UploadThread uploadThread = new UploadThread();
+                uploadThread.start();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -203,5 +217,63 @@ public class WriteActivty extends AppCompatActivity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public class UploadThread extends Thread{
+        @Override
+        public void run() {
+            super.run();
+            try {
+                // OkHttpClient 개체를 만들고
+                OkHttpClient client = new OkHttpClient();
+                // Request의 Builder로 uri를 받고
+                Request.Builder builder = new Request.Builder();
+                builder = builder.url("http://192.168.35.240:8080/BasicServer_war_exploded/upload.jsp");
+
+                // editTextView에서 데이터를 가져와서
+                String mobile_str1 =editText.getText().toString();
+                String mobile_str2 = editText2.getText().toString();
+
+                /*
+                // FormBody의 Builder 개체에 넣은 다음에
+                FormBody.Builder formBuilder = new FormBody.Builder();
+                formBuilder.add("mobile_str1",mobile_str1);
+                formBuilder.add("mobile_str2",mobile_str2);
+
+                // 그걸로 FormBody를 만들고
+                FormBody body = formBuilder.build();
+                builder=builder.post(body);
+
+                // Request 개체를 만들고
+                Request request = builder.build();
+                // 그리고 execute를 요청한다.
+                Call call = client.newCall(request);
+                call.execute();
+                 */
+                // 파라미터 데이터와 파일데이터를 함께 보내야 하기때문에
+                // MultipartBody의 Builder 개체를 이용한다.
+                MultipartBody.Builder multiBuilder = new MultipartBody.Builder();
+                multiBuilder.setType(MultipartBody.FORM);
+
+                // 서버로 보낼 파라미터 데이터를 구성한다.
+                multiBuilder.addFormDataPart("mobile_str1",mobile_str1);
+                multiBuilder.addFormDataPart("mobile_str2",mobile_str2);
+
+                // 파일 데이터를 구성한다.
+                File file = new File(picPath);
+                RequestBody body=RequestBody.create(MultipartBody.FORM,file);
+                multiBuilder.addFormDataPart("mobile_image",file.getName(),body);
+
+                // 개체를 만들어준다.
+                MultipartBody multipartBody = multiBuilder.build();
+                // 그리고 Request 빌더에 멀티파트바디 개체를 넣어준다.
+                builder = builder.post(multipartBody);
+                Request request = builder.build();
+                Call call = client.newCall(request);
+                call.execute();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 }
