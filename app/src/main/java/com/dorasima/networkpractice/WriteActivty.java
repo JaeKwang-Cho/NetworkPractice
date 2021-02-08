@@ -228,7 +228,7 @@ public class WriteActivty extends AppCompatActivity {
                 OkHttpClient client = new OkHttpClient();
                 // Request의 Builder로 uri를 받고
                 Request.Builder builder = new Request.Builder();
-                builder = builder.url("http://192.168.35.240:8080/BasicServer_war_exploded/upload.jsp");
+                builder = builder.url("http://192.168.35.240:8080/TestServer/index.jsp");
 
                 // editTextView에서 데이터를 가져와서
                 String mobile_str1 =editText.getText().toString();
