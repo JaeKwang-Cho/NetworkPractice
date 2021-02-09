@@ -1,0 +1,50 @@
+<%@ page language="java" contentType="text/plain; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="com.oreilly.servlet.*" %>
+<%@ page import="com.oreilly.servlet.multipart.*" %>
+<%@ page import="java.sql.*" %>
+<%
+//upload 폴더까지의 경로를 얻어온다.
+	String path = getServletContext().getRealPath("upload");
+	System.out.println(path);
+
+	// 최대 파일 용량
+	int max = 1024 * 1024 * 100; 	// 100 mb
+
+	// 이름 변경 정책
+	DefaultFileRenamePolicy policy = new DefaultFileRenamePolicy();
+	System.out.println("request getContentType: "+request.getContentType());
+
+	// 업로드 처리
+	MultipartRequest mr = new MultipartRequest(request, path, max, "utf-8", policy);
+
+	System.out.println("request getContentType: "+request.getContentType());
+
+	String mobile_str1 = mr.getParameter("mobile_str1");
+	String mobile_str2 = mr.getParameter("mobile_str2");
+	String mobile_image = mr.getFilesystemName("mobile_image");
+
+	// JDBC 드라이버 로딩
+	Class.forName("oracle.jdbc.OracleDriver");
+	String url = "jdbc:oracle:thin:@localhost:1521:orcl";
+	String id = "sys as sysdba";
+	String pw = "1234";
+
+	// 데이터 베이스 접속
+	Connection db = DriverManager.getConnection(url, id,pw);
+
+	// 쿼리문
+	String sql = "insert into test_table "
+				+"(mobile_idx, mobile_image, mobile_str1, mobile_str2) "
+				+"values (test_seq.nextval, ?, ?, ?)";
+
+	// 쿼리 실행
+	PreparedStatement pstmt = db.prepareStatement(sql);
+	pstmt.setString(1, mobile_image);
+	pstmt.setString(2, mobile_str1);
+	pstmt.setString(3, mobile_str2);
+
+	pstmt.execute();
+	db.close();
+%>
+OK
