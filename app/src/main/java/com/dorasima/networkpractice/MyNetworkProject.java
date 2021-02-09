@@ -88,6 +88,13 @@ public class MyNetworkProject extends AppCompatActivity implements CustomRecycle
             @Override
             public void onItemClick(View v, int position) {
                 Intent detail_intent = new Intent(MyNetworkProject.this,DetailActivity.class);
+
+                //  항목 번째 해시맵을 추출한다.
+                HashMap<String, Object> map = (HashMap<String, Object>)listData.get(position);
+                // 글의 인덱스 번호를 가져와서 넘긴다.
+                int mobile_idx = (Integer)map.get("mobile_idx");
+                detail_intent.putExtra("mobile_idx",mobile_idx);
+
                 startActivity(detail_intent);
             }
         });
