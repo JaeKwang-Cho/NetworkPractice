@@ -1,5 +1,6 @@
 package com.dorasima.networkpractice;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,10 +69,20 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         HashMap<String, Object> map = mDataList.get(position);
 
-        int mobile_img = (Integer)map.get("mobile_image");
+        String mobile_img = (String)map.get("mobile_image");
         String mobile_str1 = (String)map.get("mobile_str1");
 
-        holder.imageView.setImageResource(mobile_img);
+        // Image가 담긴 HashMap에서 이미지를 추출한다.
+        Bitmap bitmap = MyNetworkProject.imageMap.get(mobile_img);
+        if( bitmap==null){
+            // 이미지 데이터가 없을때 가져오는 스레드를 만든다.
+            MyNetworkProject.ImageNetworkThread thread = new MyNetworkProject.ImageNetworkThread(mobile_img);
+            thread.start();
+        }else{
+            holder.imageView.setImageBitmap(bitmap);
+        }
+
+        //holder.imageView.setImageResource(mobile_img);
         holder.textView3.setText(mobile_str1);
     }
 
