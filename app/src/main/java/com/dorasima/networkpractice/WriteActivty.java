@@ -24,15 +24,20 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class WriteActivty extends AppCompatActivity {
 
@@ -234,22 +239,6 @@ public class WriteActivty extends AppCompatActivity {
                 String mobile_str1 =editText.getText().toString();
                 String mobile_str2 = editText2.getText().toString();
 
-                /*
-                // FormBody의 Builder 개체에 넣은 다음에
-                FormBody.Builder formBuilder = new FormBody.Builder();
-                formBuilder.add("mobile_str1",mobile_str1);
-                formBuilder.add("mobile_str2",mobile_str2);
-
-                // 그걸로 FormBody를 만들고
-                FormBody body = formBuilder.build();
-                builder=builder.post(body);
-
-                // Request 개체를 만들고
-                Request request = builder.build();
-                // 그리고 execute를 요청한다.
-                Call call = client.newCall(request);
-                call.execute();
-                 */
                 // 파라미터 데이터와 파일데이터를 함께 보내야 하기때문에
                 // MultipartBody의 Builder 개체를 이용한다.
                 MultipartBody.Builder multiBuilder = new MultipartBody.Builder();
@@ -269,10 +258,29 @@ public class WriteActivty extends AppCompatActivity {
                 // 그리고 Request 빌더에 멀티파트바디 개체를 넣어준다.
                 builder = builder.post(multipartBody);
                 Request request = builder.build();
+
                 Call call = client.newCall(request);
-                call.execute();
+                NetworkCallback callback = new NetworkCallback();
+                call.enqueue(callback);
+
+                //call.execute();
             }catch (Exception e){
                 e.printStackTrace();
+            }
+        }
+    }
+
+    protected class NetworkCallback implements Callback {
+        @Override
+        public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+        }
+        @Override
+        // 응답 결과를 받는다.
+        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+            String result = response.body().string();
+            if(result.trim().equals("OK")){
+                finish();
             }
         }
     }
