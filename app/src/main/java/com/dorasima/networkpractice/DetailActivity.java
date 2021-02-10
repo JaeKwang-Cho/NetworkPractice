@@ -80,8 +80,8 @@ public class DetailActivity extends AppCompatActivity {
             try {
                 String result = response.body().string();
 
-                JSONObject object = null;
-                object = new JSONObject(result);
+                JSONObject object = new JSONObject(result);
+
                 String mobile_image = object.getString("mobile_image");
                 final String mobile_str1 = object.getString("mobile_str1");
                 final String mobile_str2 = object.getString("mobile_str2");

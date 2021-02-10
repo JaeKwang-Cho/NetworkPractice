@@ -1,0 +1,40 @@
+<%@ page language="java" contentType="application/json; charset=UTF-8"
+    pageEncoding="EUC-KR"%>
+<%@ page import="java.sql.*"%>
+<%@ page import="org.json.simple.*"%>
+<%
+//JDBC 드라이버 로딩
+	Class.forName("oracle.jdbc.OracleDriver");
+	String url = "jdbc:oracle:thin:@localhost:1521:orcl";
+	String id = "sys as sysdba";
+	String pw = "1234";
+
+	// 데이터 베이스 접속
+	Connection db = DriverManager.getConnection(url, id,pw);
+
+	// 쿼리문 작성
+	String sql = "select mobile_idx, mobile_str1, mobile_image "
+			+ "from mobile_table order by mobile_idx desc";
+
+	//쿼리 실행
+	PreparedStatement pstmt = db.prepareStatement(sql);
+
+	JSONArray root = new JSONArray();
+
+	// 테이블에 저장된 데이터를 가져온다.
+	ResultSet rs = pstmt.executeQuery();
+	while(rs.next()){
+		int mobile_idx = rs.getInt("mobile_idx");
+		String mobile_str1 = rs.getString("mobile_str1");
+		String mobile_image = rs.getString("mobile_image");
+
+		JSONObject obj = new JSONObject();
+		obj.put("mobile_idx",mobile_idx);
+		obj.put("mobile_str1",mobile_str1);
+		obj.put("mobile_image",mobile_image);
+
+		root.add(obj);
+	}
+	db.close();
+%>
+<%= root.toJSONString()%>

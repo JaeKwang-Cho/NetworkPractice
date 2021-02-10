@@ -48,13 +48,12 @@ public class WriteActivty extends AppCompatActivity {
     // 이미지 파일명을 포함한 경로
     String picPath;
 
-    EditText editText, editText2;
-
     // Activity를 구분하기 위한 값
     final int CAMERA_ACTIVITY = 1;
     final int GALLERY_ACTIVITY = 2;
 
     ImageView imageView2;
+    EditText editText, editText2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
