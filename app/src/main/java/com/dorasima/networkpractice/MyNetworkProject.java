@@ -55,6 +55,7 @@ public class MyNetworkProject extends AppCompatActivity {
     public static ArrayList<HashMap<String, Object>> listData = new ArrayList<HashMap<String, Object>>();
     public static RecyclerView main_list;
     TextView textView7;
+    static CustomRecyclerAdapter.CustomItemClickListener customItemClickListener;
 
     public static Context context;
 
@@ -86,10 +87,7 @@ public class MyNetworkProject extends AppCompatActivity {
 
         // LinearLayoutManager를 세팅해주는 것을 잊지말자.
         main_list.setLayoutManager(new LinearLayoutManager(this));
-        CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData);
-        // 리싸이클러 아이템 리스너는 이렇게 사용한다.
-        main_list.setAdapter(adapter);
-        CustomRecyclerAdapter.CustomItemClickListener customItemClickListener = new CustomRecyclerAdapter.CustomItemClickListener() {
+        customItemClickListener = new CustomRecyclerAdapter.CustomItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
                 Intent detail_intent = new Intent(MyNetworkProject.this,DetailActivity.class);
@@ -102,7 +100,9 @@ public class MyNetworkProject extends AppCompatActivity {
                 startActivity(detail_intent);
             }
         };
-        adapter.setOnItemClickListener(customItemClickListener);
+        CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData,customItemClickListener);
+        // 리싸이클러 아이템 리스너는 이렇게 사용한다.
+        main_list.setAdapter(adapter);
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -206,7 +206,7 @@ public class MyNetworkProject extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData);
+                        CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData,customItemClickListener);
                         main_list.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
                     }
@@ -240,7 +240,7 @@ public class MyNetworkProject extends AppCompatActivity {
                 runOnUI(new Runnable() {
                     @Override
                     public void run() {
-                        CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData);
+                        CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData,customItemClickListener);
                         main_list.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
                     }

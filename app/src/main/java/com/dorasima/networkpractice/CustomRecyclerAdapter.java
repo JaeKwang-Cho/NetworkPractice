@@ -1,5 +1,6 @@
 package com.dorasima.networkpractice;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 // 리스트의 어뎁터
 public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAdapter.ViewHolder> {
     private ArrayList<HashMap<String, Object>> mDataList = null;
-    private CustomItemClickListener listener;
+    private CustomItemClickListener listener = null;
 
     public interface CustomItemClickListener{
         void onItemClick(View v, int position);
@@ -48,11 +49,8 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
             });
         }
     }
-    // 내부 리스너를 적용하는 함수
-    public void setOnItemClickListener(CustomItemClickListener listener){
+    public CustomRecyclerAdapter(ArrayList<HashMap<String,Object>> list,CustomItemClickListener listener){
         this.listener = listener;
-    }
-    public CustomRecyclerAdapter(ArrayList<HashMap<String,Object>> list){
         mDataList = list;
     }
     @NonNull
