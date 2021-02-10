@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -48,11 +49,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MyNetworkProject extends AppCompatActivity implements CustomRecyclerAdapter.OnItemClickListener {
+public class MyNetworkProject extends AppCompatActivity {
     
     // 리스트뷰 구성을 위해서 필요한 데이터가 담겨 있는 ArrayList
     public static ArrayList<HashMap<String, Object>> listData = new ArrayList<HashMap<String, Object>>();
     public static RecyclerView main_list;
+    TextView textView7;
 
     public static Context context;
 
@@ -71,12 +73,14 @@ public class MyNetworkProject extends AppCompatActivity implements CustomRecycle
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_network_project);
 
-        main_list = (RecyclerView)findViewById(R.id.main_list);
+        main_list = (RecyclerView) findViewById(R.id.main_list);
+        textView7 = (TextView) findViewById(R.id.textView7);
         context = this;
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            requestPermissions(permission_list,0);
-        }else{
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permission_list, 0);
+        }
+        else {
             init();
         }
 
@@ -84,7 +88,8 @@ public class MyNetworkProject extends AppCompatActivity implements CustomRecycle
         main_list.setLayoutManager(new LinearLayoutManager(this));
         CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData);
         // 리싸이클러 아이템 리스너는 이렇게 사용한다.
-        adapter.setOnItemClickListener(new CustomRecyclerAdapter.OnItemClickListener(){
+        main_list.setAdapter(adapter);
+        CustomRecyclerAdapter.CustomItemClickListener customItemClickListener = new CustomRecyclerAdapter.CustomItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
                 Intent detail_intent = new Intent(MyNetworkProject.this,DetailActivity.class);
@@ -94,14 +99,11 @@ public class MyNetworkProject extends AppCompatActivity implements CustomRecycle
                 // 글의 인덱스 번호를 가져와서 넘긴다.
                 int mobile_idx = (Integer)map.get("mobile_idx");
                 detail_intent.putExtra("mobile_idx",mobile_idx);
-
                 startActivity(detail_intent);
             }
-        });
-        main_list.setAdapter(adapter);
-        // adapter.notifyDataSetChanged();
+        };
+        adapter.setOnItemClickListener(customItemClickListener);
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -110,11 +112,7 @@ public class MyNetworkProject extends AppCompatActivity implements CustomRecycle
                 return;
             }
         }
-       // init();;
-    }
-    @Override
-    public void onItemClick(View v, int position) {
-        Log.d("test","clicked "+position);
+       // init();
     }
 
     @Override

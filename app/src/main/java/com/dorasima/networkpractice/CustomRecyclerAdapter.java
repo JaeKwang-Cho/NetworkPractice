@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,46 +15,43 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 // 리스트의 어뎁터
-public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAdapter.ViewHolder>{
+public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAdapter.ViewHolder> {
     private ArrayList<HashMap<String, Object>> mDataList = null;
-    // 클래스 내부의 리스너를 담을 변수
-    private OnItemClickListener onItemClickListener;
+    private CustomItemClickListener listener;
+
+    public interface CustomItemClickListener{
+        void onItemClick(View v, int position);
+    }
 
     // ViewHolder에서 OnclickListener를 implement 한다.
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder{
         protected final ImageView imageView;
         protected final TextView textView3;
 
-        ViewHolder(View view,OnItemClickListener onItemClickListener){
+        ViewHolder(View view) {
             super(view);
-            imageView = (ImageView)view.findViewById(R.id.imageView);
-            textView3 = (TextView)view.findViewById(R.id.textView3);
+            imageView = (ImageView) view.findViewById(R.id.imageView);
+            textView3 = (TextView) view.findViewById(R.id.textView3);
 
-            // 리스너를 적용한다.
-            view.setOnClickListener(this);
-        }
-        @Override
-        // onClick을 오버라이딩하는데
-        public void onClick(View view) {
-            // 선택된 뷰 홀더의 인덱스를 얻고
-            int pos = getAdapterPosition();
-            if(pos != RecyclerView.NO_POSITION){
-                if(onItemClickListener!=null){
-                    // 내부 인터페이스의 onItemClick을 호출한다.
-                    onItemClickListener.onItemClick(view,pos);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                // onClick을 오버라이딩하는데
+                public void onClick(View view) {
+                    int pos = getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION) {
+                        if (listener != null) {
+                            // 내부 인터페이스의 onItemClick을 호출한다.
+                            listener.onItemClick(view, pos);
+                        }
+                    }
                 }
-            }
+            });
         }
     }
     // 내부 리스너를 적용하는 함수
-    public void setOnItemClickListener(OnItemClickListener listener){
-        this.onItemClickListener = listener;
+    public void setOnItemClickListener(CustomItemClickListener listener){
+        this.listener = listener;
     }
-    // 인터페이스로 사용할, onItemClick 메서드
-    public interface OnItemClickListener{
-        void onItemClick(View v,int position);
-    }
-
     public CustomRecyclerAdapter(ArrayList<HashMap<String,Object>> list){
         mDataList = list;
     }
@@ -61,7 +59,7 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_of_list, parent, false);
-        ViewHolder viewHolder= new ViewHolder(view,onItemClickListener);
+        ViewHolder viewHolder= new ViewHolder(view);
 
         return viewHolder;
     }
