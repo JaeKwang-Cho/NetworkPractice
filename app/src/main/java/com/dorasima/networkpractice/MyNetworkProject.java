@@ -67,7 +67,11 @@ public class MyNetworkProject extends AppCompatActivity {
             Manifest.permission.CAMERA,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE
-};
+    };
+    public void nextBtn(View view){
+        Intent intent = new Intent(this, VideoStream.class);
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +79,6 @@ public class MyNetworkProject extends AppCompatActivity {
         setContentView(R.layout.activity_my_network_project);
 
         main_list = (RecyclerView) findViewById(R.id.main_list);
-        textView7 = (TextView) findViewById(R.id.textView7);
         context = this;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -5,17 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MyNetworkProject">
+    tools:context=".VideoStream">
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/button6"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="nextBtn"
-        android:text="next" />
+        android:onClick="showVideoBtn"
+        android:text="play_video" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/main_list"
+    <VideoView
+        android:id="@+id/videoView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 </LinearLayout>
