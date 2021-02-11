@@ -78,9 +78,10 @@ public class MyNetworkProject extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_network_project);
 
+        // 뷰 주소 지정
         main_list = (RecyclerView) findViewById(R.id.main_list);
         context = this;
-
+        // 버전 확인하고 권한 얻기
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(permission_list, 0);
         }
@@ -90,6 +91,7 @@ public class MyNetworkProject extends AppCompatActivity {
 
         // LinearLayoutManager를 세팅해주는 것을 잊지말자.
         main_list.setLayoutManager(new LinearLayoutManager(this));
+        // RecyclerView 내부에 있는 인터페이스를 오버라이딩하기
         customItemClickListener = new CustomRecyclerAdapter.CustomItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
@@ -103,11 +105,13 @@ public class MyNetworkProject extends AppCompatActivity {
                 startActivity(detail_intent);
             }
         };
+        // 그걸 생성자와 함께 넘겨주기
         CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData,customItemClickListener);
         // 리싸이클러 아이템 리스너는 이렇게 사용한다.
         main_list.setAdapter(adapter);
     }
     @Override
+    // 권한을 받을때 호출되는 함수
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         for(int result:grantResults){
@@ -117,17 +121,21 @@ public class MyNetworkProject extends AppCompatActivity {
         }
        // init();
     }
-
     @Override
+    // 메뉴 선택시 호출되는 함수
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
         switch (id){
+            // 쓰기 메뉴 클릭하면 업로드하는 액티비티 호출
             case R.id.menu_write:
                 Intent write_intent= new Intent(this, WriteActivty.class);
                 startActivity(write_intent);
                 break;
+                // 아래 write 하고 돌아올때 호출되는 스레드를 그대로 넣어준다.
             case R.id.menu_reload:
+                GetDataThread thread = new GetDataThread();
+                thread.start();
                 break;
             default:
                 break;
@@ -158,7 +166,6 @@ public class MyNetworkProject extends AppCompatActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
-
         GetDataThread thread = new GetDataThread();
         thread.start();
     }
@@ -167,11 +174,14 @@ public class MyNetworkProject extends AppCompatActivity {
         @Override
         public void run() {
             super.run();
+            // 클라이언트를 만들고
             OkHttpClient client = new OkHttpClient();
+            // 주소로 Request를 만emsek.
             Request.Builder builder = new Request.Builder();
             builder = builder.url("http://192.168.35.240:8080/TestServer/get_list.jsp");
             Request request = builder.build();
 
+            // 콜백을 지정해준다.
             MyCallback callback1 = new MyCallback();
             Call call = client.newCall(request);
             call.enqueue(callback1);
@@ -186,15 +196,16 @@ public class MyNetworkProject extends AppCompatActivity {
         @Override
         public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
             String result = response.body().string();
-
+            // 리스트를 싹 비우고
             listData.clear();
             //
             try {
+                // JSON에서 문자열을 받아오고
                 JSONArray root = new JSONArray(result);
 
                 for(int i = 0;i<root.length();i++){
                     JSONObject obj = root.getJSONObject(i);
-
+                    // 데이터를 잘라서 받는다.
                     int mobile_idx = obj.getInt("mobile_idx");
                     String mobile_str1 = obj.getString("mobile_str1");
                     String mobile_image = obj.getString("mobile_image");
@@ -209,6 +220,7 @@ public class MyNetworkProject extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        // 리스트 뷰를 초기화 한다.
                         CustomRecyclerAdapter adapter = new CustomRecyclerAdapter(listData,customItemClickListener);
                         main_list.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
@@ -223,7 +235,7 @@ public class MyNetworkProject extends AppCompatActivity {
     // 이미지 데이터를 받아오는 스레드
     public static class ImageNetworkThread extends Thread{
         String fileName;
-
+        // 스레드 생성자를 정의한다.
         ImageNetworkThread(String fileName){
             this.fileName = fileName;
         }
@@ -232,14 +244,17 @@ public class MyNetworkProject extends AppCompatActivity {
         public void run() {
             super.run();
             try {
+                // 서버의 업로드 폴더에서 파일이름의 사진을 받아서
                 URL url = new URL("http://192.168.35.240:8080/TestServer/upload/"+fileName);
-
+                // 연결 해준 다음에
                 URLConnection connection = url.openConnection();
+                // InputStream 으로 받고
                 InputStream is = connection.getInputStream();
+                // Bitmap으로 변환해준다.
                 Bitmap bitmap = BitmapFactory.decodeStream(is);
 
                 imageMap.put(fileName,bitmap);
-
+                // 이미지 받는 스레드가 static 스레드이므로
                 runOnUI(new Runnable() {
                     @Override
                     public void run() {
@@ -254,10 +269,13 @@ public class MyNetworkProject extends AppCompatActivity {
         }
     }
     // 스테틱 메서드에서 UI 변경 스레드를 호출하려면 이렇게 한다.
+    // Handler의 개체를 만들고
     public static Handler UIHandler;
     static{
+        // 스레드와 함께 백그라운드에서 일할 Looper를 핸들러에 넘겨주고
         UIHandler = new Handler(Looper.getMainLooper());
     }
+    // 핸들러에 Runnable 개체를 만들어서 넘겨주는 식으로 UI를 변경하는 스레드를 생성한다.
     public static void runOnUI(Runnable runnable){
         UIHandler.post(runnable);
     }

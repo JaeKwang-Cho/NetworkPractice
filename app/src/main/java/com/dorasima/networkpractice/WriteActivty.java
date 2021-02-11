@@ -81,12 +81,15 @@ public class WriteActivty extends AppCompatActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.menu_camera:
+                // MediaStore에서 ACTION_IMAGE_CAPTURE 플래그를 지정하고
                 Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                // 파일명과
                 String fileName = "temp_"+System.currentTimeMillis()+".jpg";
+                // 경로를 지정해준 다음에
                 picPath = dirPath+"/"+fileName;
 
                 File file = new File(picPath);
-
+                // 버전에 따라 컨텐츠 프로바이더를 이용할지 정하고
                 if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.N){
                     contentUri = FileProvider.getUriForFile(
                             this, "com.dorasima.networkclientpractice.file_provider",file
@@ -94,15 +97,21 @@ public class WriteActivty extends AppCompatActivity {
                 }else{
                     contentUri = Uri.fromFile(file);
                 }
+                // 위에서 만든 카메라 Intent에 EXTRA_OUTPUT에 쓰일 프로바이더 정보를 넣어주고
                 camera_intent.putExtra(MediaStore.EXTRA_OUTPUT,contentUri);
+                // 카메라 액티비티를 실행한다.
                 startActivityForResult(camera_intent,CAMERA_ACTIVITY);
                 break;
             case R.id.menu_gallery:
+                // ACTION_PICK으로 인텐트를 만들어주고
                 Intent gallery_intent = new Intent(Intent.ACTION_PICK);
+                // setType으로 MediaStore에 CONTENT_TYPE으로 넣어준다.
                 gallery_intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+                // 갤러리 액티비티를 실행한다.
                 startActivityForResult(gallery_intent,GALLERY_ACTIVITY);
                 break;
             case R.id.menu_upload:
+                // 업로드 스레드를 실행한다.
                 UploadThread uploadThread = new UploadThread();
                 uploadThread.start();
                 break;
@@ -139,6 +148,7 @@ public class WriteActivty extends AppCompatActivity {
                 // 해당 사진의 경로를 얻는다.
                 String sourcePath = cursor.getString(idx);
 
+                // 사진 조정을 해주고
                 Bitmap bitmap = BitmapFactory.decodeFile(sourcePath);
                 Bitmap bitmap2 = resizeBitmap(1024,bitmap);
                 float degree = getDegree(sourcePath);
@@ -278,6 +288,7 @@ public class WriteActivty extends AppCompatActivity {
         // 응답 결과를 받는다.
         public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
             String result = response.body().string();
+            // OK를 받으면 끈다.
             if(result.trim().equals("OK")){
                 finish();
             }
